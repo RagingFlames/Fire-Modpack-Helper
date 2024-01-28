@@ -1,0 +1,1 @@
+pyinstaller main.py --clean --onefile --console --name ParadoxModPackHelper.exe --distpath .
