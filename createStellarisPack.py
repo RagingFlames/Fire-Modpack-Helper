@@ -1,24 +1,8 @@
 import os
-import shutil
 import sqlite3
 
-
-def copy_files(src_folder, dest_folder):
-    # Walk through the source folder
-    for root, dirs, files in os.walk(src_folder):
-        for file in files:
-            src_path = os.path.join(root, file)
-
-            # Preserve the relative path structure in the destination folder
-            relative_path = os.path.relpath(src_path, src_folder)
-            dest_path = os.path.join(dest_folder, relative_path)
-
-            # Create the necessary directories in the destination folder
-            os.makedirs(os.path.dirname(dest_path), exist_ok=True)
-
-            # Copy the file, overwriting if it already exists
-            shutil.copy2(src_path, dest_path)
-            print(f"Copied: {src_path} to {dest_path}")
+import util
+from util import copy_files
 
 
 def create_modpack():
@@ -66,7 +50,8 @@ def create_modpack():
     input("Press 'Enter' to continue")
 
     # Make the mod folder
-    modPackName = input("What is the name for this new modpack?")
+    modPackName = input("What is the name for this new modpack?\n")
+    modPackVersion = input("What is the version for this new modpack? (IE 3.10.1)\n")
     destination = os.path.join(destination, modPackName)
     try:
         os.mkdir(destination)
@@ -79,8 +64,8 @@ def create_modpack():
     # Find the workshop mods
     workshopPath = ""
     while True:
-        workshopPath = input("Copy paste the path to your stellaris workshop folder")
-        if not workshopPath.rsplit("\\", 1)[-1] == "281990":
+        workshopPath = input("Copy paste the path to your stellaris workshop folder\n")
+        if not workshopPath.rsplit("\\", 1)[-1] == "281990": # A really stupid simple check for the right path
             print("It looks like yu didn't paste the correct folder, the path should end at the '281990' folder")
         else:
             break
@@ -96,3 +81,7 @@ def create_modpack():
     # Commit the changes and close the connection
     connection.commit()
     connection.close()
+
+    # Make the description files
+    util.make_mod_file(modPackName, modPackVersion)
+    util.make_descriptor_file(modPackName, modPackVersion, destination)
