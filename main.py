@@ -18,7 +18,7 @@ def sort_mods(e):
 def main_help():
     print("0: Rename mod folders")
     print(
-        "You can use this to rename the stellaris workshop folder sto something human readable. First copy everything in your stellaris workshop folder to a" +
+        "You can use this to rename the stellaris workshop folders to something human readable. First copy everything in your stellaris workshop folder to a" +
         "temporary directory. Then run the script from that directory, or point the script at that directory. This will make a copy of all your stellaris mod" +
         " folders with relevant names. For example '1121692237' would be renamed to 'Gigastructural Engineering & More '")
     print("1: Create modpack")
@@ -70,8 +70,8 @@ def rename_folders():
 
 def createModpack():
     print("Which game is this modpack for?")
-    print("0: Barotrauma")
-    selection = input("9: Stellaris\n")
+    print("1: Barotrauma")
+    selection = input("2: Stellaris\n")
     while True:
 
         match selection:
@@ -81,7 +81,7 @@ def createModpack():
             case "1": #Barotrauma
                 createBarotraumaPack.create_modpack()
                 break
-            case "9": #Stellaris
+            case "2": #Stellaris
                 createStellarisPack.create_modpack()
                 break
             case _:
