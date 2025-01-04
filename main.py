@@ -66,8 +66,6 @@ def rename_folders():
                     print(f"Error processing folder {folder_path}: {e}")
     input("Press enter to continue")
 
-
-
 def createModpack():
     print("Which game is this modpack for?")
     print("1: Barotrauma")
@@ -86,6 +84,7 @@ def createModpack():
                 break
             case _:
                 print("Please retype answer")
+                break
 
 if __name__ == '__main__':
 
@@ -107,3 +106,4 @@ if __name__ == '__main__':
                 break
             case _:
                 print("Please retype answer")
+
