@@ -1,13 +1,7 @@
 import datetime
 import os
 import sqlite3
-
 import util
-from util import copy_files
-
-def add_repo_mods(destination):
-
-
 
 def create_modpack(defaults):
     # Connect to the SQLite database file (create a new file if it doesn't exist)
@@ -82,7 +76,7 @@ def create_modpack(defaults):
     # Start copying the files
     for mod in modWorkshopIDList:
         workshopModFolder = os.path.join(workshopPath, mod[2])
-        copy_files(workshopModFolder, destination)
+        util.copy_files(workshopModFolder, destination)
 
     # Close the cursor
     cursor.close()
@@ -91,5 +85,6 @@ def create_modpack(defaults):
     connection.close()
 
     # Make the description files
-    util.make_mod_file(modPackName, modPackVersion, destination)
+    util.make_mod_file(modPackName, modPackVersion, os.path.dirname(destination))
     util.make_descriptor_file(modPackName, modPackVersion, destination)
+    util.add_repo_mods(os.path.dirname(destination), modPackVersion)
