@@ -1,6 +1,9 @@
 import os
 import shutil
+from git import Repo
+import json
 
+GIT_REPOS_PATH = os.path.join(os.path.curdir,"repo-mods.json")
 
 def copy_files(src_folder, dest_folder):
     # Walk through the source folder
@@ -41,7 +44,61 @@ def convert_path(clipboard_path):
 
     return formatted_path
 
-def make_mod_file(name, version):
+def add_repo_mods(destination, modPackVersion):
+    # Load repo data
+    try:
+        if os.path.exists(GIT_REPOS_PATH):
+            with open(GIT_REPOS_PATH, "r") as file:
+                try:
+                    repos = json.load(file)
+                except json.JSONDecodeError:
+                    print("Error decoding JSON")
+        else:
+            print(f"Config file not found.")
+            return
+    except Exception as e:
+        print("An error occurred:", str(e))
+        return
+
+   
+    repo_keys = list(repos.keys())
+    selected = set()
+    message = "If you want additional git repo based mods to be added, add them now."
+    while True:
+        # Clear the screen
+        os.system('cls' if os.name == 'nt' else 'clear')
+        # Print options
+        print(message)
+        print("Select a repo (enter number). Type 0 to finish.\n")
+        message = ""
+        for i, key in enumerate(repo_keys, start=1):
+            prefix = "+" if i in selected else " "
+            print(f"{prefix} {i}: {key}")
+
+        selection = input("\nEnter number: ").strip()
+        # Selection logic
+        if selection == "0":
+            break
+
+        if selection.isdigit():
+            selection = int(selection)
+            if 1 <= selection <= len(repo_keys):
+                if selection in selected:
+                    selected.remove(selection)
+                else:
+                    selected.add(selection)
+            else:
+                message = "Invalid number."
+        else:
+            message = "Invalid input."
+
+    # Clone the repos
+    for i in sorted(selected):
+        repo_destination=os.path.join(destination,repo_keys[i-1])
+        Repo.clone_from(repos[repo_keys[i-1]],repo_destination)
+        make_mod_file(repo_keys[i-1], modPackVersion, destination)
+
+def make_mod_file(name, version, destination):
     ## The mod file template
     content = f'''name="{name}"
 version="{version}"
@@ -52,11 +109,11 @@ picture="thumbnail.png"
 supported_version="{version}"
 path="mod/{name}"'''
     ## Writing to disk
-    with open(name+".mod", "w") as file: # Name the file the same name as the folder plus the .mod extension
+    file_path = os.path.join(destination, name+".mod")
+    with open(file_path, "w") as file: # Name the file the same name as the folder plus the .mod extension
         file.write(content)
-    print("Content has been written to mod_info.txt")
 
-def make_descriptor_file(name, version, path):
+def make_descriptor_file(name, version, destination):
     # Define the content string using the provided template
     content = f'''name="{name}"
 version="{version}"
@@ -67,11 +124,9 @@ picture="thumbnail.png"
 supported_version="{version}"'''
 
     # Specify the file path
-    file_path = os.path.join(path, "descriptor.mod")
+    file_path = os.path.join(destination, "descriptor.mod")
 
     # Write content to the specified file path
     with open(file_path, "w") as file:
         file.write(content)
-
-    print(f"Content has been written to {file_path}")
 

@@ -1,13 +1,12 @@
+import datetime
 import os
 import sqlite3
-
 import util
-from util import copy_files
 
-
-def create_modpack():
+def create_modpack(defaults):
     # Connect to the SQLite database file (create a new file if it doesn't exist)
-    destination = os.getcwd()
+    formatted_datetime = datetime.datetime.now().strftime("%Y-%m-%d_%H.%M.%S")
+    destination = os.path.join(os.getcwd(),formatted_datetime + "_Mod-Pack-Output")
     db_file_path = os.path.join(os.path.expanduser("~"), "Documents", "Paradox Interactive", "Stellaris", "launcher-v2.sqlite")
     connection = sqlite3.connect(db_file_path)
 
@@ -62,19 +61,22 @@ def create_modpack():
         print(f"An error occurred: {e}")
 
     # Find the workshop mods
-    workshopPath = ""
-    while True:
-        workshopPath = input("Copy paste the path to your stellaris workshop folder\n")
-        if not workshopPath.rsplit("\\", 1)[-1] == "281990": # A really stupid simple check for the right path
-            print("It looks like yu didn't paste the correct folder, the path should end at the '281990' folder")
-        else:
-            break
+    workshopPath = defaults["stellaris"]
+    if not workshopPath.rsplit("\\", 1)[-1] == "281990": # A really stupid simple check for the right path
+        print("It looks like yu didn't paste the correct folder, the path should end at the '281990' folder")
+    else: 
+        while True:
+            workshopPath = input("Copy paste the path to your stellaris workshop folder\n")
+            if not workshopPath.rsplit("\\", 1)[-1] == "281990": # A really stupid simple check for the right path
+                print("It looks like yu didn't paste the correct folder, the path should end at the '281990' folder")
+            else:
+                break
 
     # workshopPath = convert_path(workshopPath)
     # Start copying the files
     for mod in modWorkshopIDList:
         workshopModFolder = os.path.join(workshopPath, mod[2])
-        copy_files(workshopModFolder, destination)
+        util.copy_files(workshopModFolder, destination)
 
     # Close the cursor
     cursor.close()
@@ -83,5 +85,6 @@ def create_modpack():
     connection.close()
 
     # Make the description files
-    util.make_mod_file(modPackName, modPackVersion)
+    util.make_mod_file(modPackName, modPackVersion, os.path.dirname(destination))
     util.make_descriptor_file(modPackName, modPackVersion, destination)
+    util.add_repo_mods(os.path.dirname(destination), modPackVersion)

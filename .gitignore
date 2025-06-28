@@ -1,7 +1,9 @@
 #Project specific
 build/
 dist/
-ParadoxModPackHelper.exe
+FireModPackHelper.exe
+[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]_[0-9][0-9].[0-9][0-9].[0-9][0-9]_Mod-Pack-Output/*
+
 # Ignore workshop folders for testing
 */[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]/
 */[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]/

@@ -1,1 +1,1 @@
-pyinstaller main.py --clean --onefile --console --name ParadoxModPackHelper.exe --distpath .
+pyinstaller main.py --clean --onefile --console --name FireModPackHelper.exe --distpath .

@@ -1,0 +1,4 @@
+python-sql
+shutils
+gitpython
+pypi-json
