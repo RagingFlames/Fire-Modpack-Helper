@@ -1,13 +1,18 @@
+import datetime
 import os
 import sqlite3
 
 import util
 from util import copy_files
 
+def add_repo_mods(destination):
+
+
 
 def create_modpack(defaults):
     # Connect to the SQLite database file (create a new file if it doesn't exist)
-    destination = os.getcwd()
+    formatted_datetime = datetime.datetime.now().strftime("%Y-%m-%d_%H.%M.%S")
+    destination = os.path.join(os.getcwd(),formatted_datetime + "_Mod-Pack-Output")
     db_file_path = os.path.join(os.path.expanduser("~"), "Documents", "Paradox Interactive", "Stellaris", "launcher-v2.sqlite")
     connection = sqlite3.connect(db_file_path)
 
@@ -86,5 +91,5 @@ def create_modpack(defaults):
     connection.close()
 
     # Make the description files
-    util.make_mod_file(modPackName, modPackVersion)
+    util.make_mod_file(modPackName, modPackVersion, destination)
     util.make_descriptor_file(modPackName, modPackVersion, destination)
