@@ -5,7 +5,7 @@ from util import yes_or_no, convert_path
 import createStellarisPack
 import util
 
-DEFAULTS_PATH = str(os.path.join(os.path.curdir(),"defaults.json"))
+DEFAULTS_PATH = os.path.join(os.path.curdir,"defaults.json")
 
 def read_config_file(): 
     # Check if the file exists
@@ -42,13 +42,13 @@ def create_modpack_help():
     print("A guided process to create a new modpack using an existing playset from the stellaris launcher. Make sure the mods in the playlist are already in "+
           "the proper mod load order.")
 
-def createModpack():
+def createModpack(defaults):
     print("Which game is this modpack for?")
     selection = input("0: Stellaris\n")
     while True:
         match selection:
             case "0": #Stellaris
-                createStellarisPack.create_modpack()
+                createStellarisPack.create_modpack(defaults)
                 break
             case _:
                 print("Please retype answer")
