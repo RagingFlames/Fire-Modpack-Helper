@@ -5,7 +5,7 @@ import util
 from util import copy_files
 
 
-def create_modpack():
+def create_modpack(defaults):
     # Connect to the SQLite database file (create a new file if it doesn't exist)
     destination = os.getcwd()
     db_file_path = os.path.join(os.path.expanduser("~"), "Documents", "Paradox Interactive", "Stellaris", "launcher-v2.sqlite")
@@ -62,13 +62,16 @@ def create_modpack():
         print(f"An error occurred: {e}")
 
     # Find the workshop mods
-    workshopPath = ""
-    while True:
-        workshopPath = input("Copy paste the path to your stellaris workshop folder\n")
-        if not workshopPath.rsplit("\\", 1)[-1] == "281990": # A really stupid simple check for the right path
-            print("It looks like yu didn't paste the correct folder, the path should end at the '281990' folder")
-        else:
-            break
+    workshopPath = defaults["stellaris"]
+    if not workshopPath.rsplit("\\", 1)[-1] == "281990": # A really stupid simple check for the right path
+        print("It looks like yu didn't paste the correct folder, the path should end at the '281990' folder")
+    else: 
+        while True:
+            workshopPath = input("Copy paste the path to your stellaris workshop folder\n")
+            if not workshopPath.rsplit("\\", 1)[-1] == "281990": # A really stupid simple check for the right path
+                print("It looks like yu didn't paste the correct folder, the path should end at the '281990' folder")
+            else:
+                break
 
     # workshopPath = convert_path(workshopPath)
     # Start copying the files
