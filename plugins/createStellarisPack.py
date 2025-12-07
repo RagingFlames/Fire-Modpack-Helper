@@ -3,7 +3,7 @@ import os
 import sqlite3
 import util
 
-def create_modpack(defaults):
+def main(defaults):
     # Connect to the SQLite database file (create a new file if it doesn't exist)
     formatted_datetime = datetime.datetime.now().strftime("%Y-%m-%d_%H.%M.%S")
     destination = os.path.join(os.getcwd(),formatted_datetime + "_Mod-Pack-Output")
@@ -88,3 +88,7 @@ def create_modpack(defaults):
     util.make_mod_file(modPackName, modPackVersion, os.path.dirname(destination))
     util.make_descriptor_file(modPackName, modPackVersion, destination)
     util.add_repo_mods(os.path.dirname(destination), modPackVersion)
+
+
+def help():
+    print ("Dummy help file")

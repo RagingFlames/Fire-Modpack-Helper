@@ -1,8 +1,8 @@
 import json
 import os
 import shutil
-from util import yes_or_no, convert_path
 import util
+import importlib.util
 
 DEFAULTS_PATH = os.path.join(os.path.curdir,"defaults.json")
 PLUGIN_PATH = "./plugins"
@@ -55,10 +55,8 @@ def run_module_functions(modules, func_name):
             print(f" → {name}: no {func_name}() function found.")
 
 def help(modules):
-    print("0: Create modpack")
-    print("A guided process for creating modpacks for a variety of games")
-    print("9: Help")
-    print("This is help")
+    print("0: help")
+    run_module_functions(modules, "help")
 
 def create_modpack_help():
     print("Stellaris:")
@@ -85,10 +83,9 @@ if __name__ == '__main__':
 
     if not modules:
         print("No valid modules found in portable-libs/")
-        return
 
     print("\nAvailable programs:")
-    print("0. help")
+    print("  0. help")
     for i, name in enumerate(modules.keys(), start=1):
         print(f"  {i}. {name}")
 
@@ -99,9 +96,9 @@ if __name__ == '__main__':
         try:
             index = int(choice) - 1
             module_name = list(modules.keys())[index]
+            modules[module_name].main()
+
         except (ValueError, IndexError):
             print("Invalid choice.")
-            return
-    modules[module_name].main()
-
+    
 
