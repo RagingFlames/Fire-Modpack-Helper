@@ -2,11 +2,10 @@ import json
 import os
 import shutil
 from util import yes_or_no, convert_path
-import createStellarisPack
 import util
 
 DEFAULTS_PATH = os.path.join(os.path.curdir,"defaults.json")
-
+PLUGIN_PATH = "./plugins"
 def read_config_file(): 
     # Check if the file exists
     try:
@@ -22,16 +21,40 @@ def read_config_file():
         print("An error occurred:", str(e))
     return defaults
 
-def is_admin():
-    try:
-        return os.getuid() == 0
-    except:
-        return False
+def load_modules(directory):
+    modules = {}
 
-def sort_mods(e):
-    return e[3]
+    for filename in os.listdir(directory):
+        if filename.endswith(".py") and not filename.startswith("_"):
+            module_name = filename[:-3]  # strip .py
+            file_path = os.path.join(directory, filename)
 
-def main_help():
+            spec = importlib.util.spec_from_file_location(module_name, file_path)
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+
+            # Require that the module has a main() function
+            if hasattr(module, "main") and callable(module.main):
+                modules[module_name] = module
+            else:
+                print(f"Warning: {filename} has no main() function. Skipping.")
+
+    return modules
+
+def run_module_functions(modules, func_name):
+
+    for name, module in modules.items():
+        func = getattr(module, func_name, None)
+
+        if callable(func):
+            try:
+                func()
+            except Exception as e:
+                print(f"   ERROR running {func_name}(): {e}")
+        else:
+            print(f" → {name}: no {func_name}() function found.")
+
+def help(modules):
     print("0: Create modpack")
     print("A guided process for creating modpacks for a variety of games")
     print("9: Help")
@@ -57,19 +80,28 @@ def createModpack(defaults):
 if __name__ == '__main__':
     # Load any default data
     defaults = read_config_file()
+    modules = load_modules(PLUGIN_PATH)
 
-    print("Please type the number for what you would like to do:")
-    print("0: Create modpack")
-    selection = input("9: help\n")
-    while True:
 
-        match selection:
-            case "0":
-                createModpack(defaults)
-                break
-            case "9":
-                main_help()
-                break
-            case _:
-                print("Please retype answer")
+    if not modules:
+        print("No valid modules found in portable-libs/")
+        return
+
+    print("\nAvailable programs:")
+    print("0. help")
+    for i, name in enumerate(modules.keys(), start=1):
+        print(f"  {i}. {name}")
+
+    choice = input("\nSelect a program to run (number): ")
+    if choice == "0":
+        help(modules)
+    else:
+        try:
+            index = int(choice) - 1
+            module_name = list(modules.keys())[index]
+        except (ValueError, IndexError):
+            print("Invalid choice.")
+            return
+    modules[module_name].main()
+
 
