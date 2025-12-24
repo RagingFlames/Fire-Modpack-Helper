@@ -96,7 +96,7 @@ if __name__ == '__main__':
         try:
             index = int(choice) - 1
             module_name = list(modules.keys())[index]
-            modules[module_name].main()
+            modules[module_name].main(defaults)
 
         except (ValueError, IndexError):
             print("Invalid choice.")

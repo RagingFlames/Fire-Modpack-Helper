@@ -1,5 +1,6 @@
 import datetime
 import os
+import sys
 import sqlite3
 import util
 
@@ -7,7 +8,22 @@ def main(defaults):
     # Connect to the SQLite database file (create a new file if it doesn't exist)
     formatted_datetime = datetime.datetime.now().strftime("%Y-%m-%d_%H.%M.%S")
     destination = os.path.join(os.getcwd(),formatted_datetime + "_Mod-Pack-Output")
-    db_file_path = os.path.join(os.path.expanduser("~"), "Documents", "Paradox Interactive", "Stellaris", "launcher-v2.sqlite")
+    if sys.platform.startswith("win"):
+        db_file_path = os.path.expanduser(
+            "~/Documents/Paradox Interactive/Stellaris/launcher-v2.sqlite"
+        )
+        stellaris_workshop = os.path.expanduser(
+            "C:/Program Files (x86)/Steam/steamapps/workshop/content/281990"
+        )  
+    elif sys.platform.startswith("linux"):
+        db_file_path = os.path.expanduser(
+            "~/.local/share/Paradox Interactive/Stellaris/launcher-v2.sqlite"
+        )
+        stellaris_workshop = os.path.expanduser(
+            "~/.steam/steam/steamapps/workshop/content/281990"
+        ) 
+    else:
+        sys.exit(f"Unsupported operating system: {sys.platform}")
     connection = sqlite3.connect(db_file_path)
 
     # Create a cursor object to execute SQL queries
@@ -53,7 +69,7 @@ def main(defaults):
     modPackVersion = input("What is the version for this new modpack? (IE 3.10.1)\n")
     destination = os.path.join(destination, modPackName)
     try:
-        os.mkdir(destination)
+        os.makedirs(destination, exist_ok=True)
         print(f"Directory '{destination}' created successfully.")
     except FileExistsError:
         print(f"Directory '{destination}' already exists.")
@@ -62,13 +78,12 @@ def main(defaults):
 
     # Find the workshop mods
     workshopPath = defaults["stellaris"]
-    if not workshopPath.rsplit("\\", 1)[-1] == "281990": # A really stupid simple check for the right path
-        print("It looks like yu didn't paste the correct folder, the path should end at the '281990' folder")
-    else: 
+    if not os.path.basename(os.path.normpath(workshopPath)) == "281990" or not os.path.isdir(workshopPath): # A really stupid simple check for the right path
+        print("It looks like we aren't looking at the correct workshop folder. Please copy and paste your workshop path.")
         while True:
             workshopPath = input("Copy paste the path to your stellaris workshop folder\n")
-            if not workshopPath.rsplit("\\", 1)[-1] == "281990": # A really stupid simple check for the right path
-                print("It looks like yu didn't paste the correct folder, the path should end at the '281990' folder")
+            if not os.path.basename(os.path.normpath(workshopPath)) == "281990": # A really stupid simple check for the right path
+                print("It looks like you didn't paste the correct folder, the path should end at the '281990' folder")
             else:
                 break
 
