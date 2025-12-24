@@ -6,7 +6,7 @@ import re
 
 from libs.paradox import make_mod_file
 
-GIT_REPOS_PATH = os.path.join(os.path.curdir,"repo-mods.json")
+ADDITIONAL_MODS_PATH = os.path.join(os.path.curdir,"additional-mods.json")
 GIT_URL_REGEX = re.compile(
     r'^(git@|ssh://git@|https://|git://)'
     r'[\w.\-@:\/]+\.git$'
@@ -51,11 +51,11 @@ def convert_path(clipboard_path):
 
     return formatted_path
 
-def add_repo_mods(destination, modPackVersion):
+def add_additional_mods(destination, modPackVersion):
     # Load repo data
     try:
-        if os.path.exists(GIT_REPOS_PATH):
-            with open(GIT_REPOS_PATH, "r") as file:
+        if os.path.exists(ADDITIONAL_MODS_PATH):
+            with open(ADDITIONAL_MODS_PATH, "r") as file:
                 try:
                     repos = json.load(file)
                 except json.JSONDecodeError:
