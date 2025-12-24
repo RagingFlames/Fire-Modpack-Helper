@@ -4,6 +4,8 @@ from git import Repo
 import json
 import re
 
+from libs.paradox import make_mod_file
+
 GIT_REPOS_PATH = os.path.join(os.path.curdir,"repo-mods.json")
 GIT_URL_REGEX = re.compile(
     r'^(git@|ssh://git@|https://|git://)'
@@ -98,41 +100,9 @@ def add_repo_mods(destination, modPackVersion):
             message = "Invalid input."
 
     # Clone the repos
+    destinations = []
     for i in sorted(selected):
         if bool(GIT_URL_REGEX.match(repos[repo_keys[i-1]])):
             repo_destination=os.path.join(destination,repo_keys[i-1])
             Repo.clone_from(repos[repo_keys[i-1]],repo_destination)
-            make_mod_file(repo_keys[i-1], modPackVersion, destination)
-
-def make_mod_file(name, version, destination):
-    ## The mod file template
-    content = f'''name="{name}"
-version="{version}"
-tags={{
-    "Gameplay"
-}}
-picture="thumbnail.png"
-supported_version="{version}"
-path="mod/{name}"'''
-    ## Writing to disk
-    file_path = os.path.join(destination, name+".mod")
-    with open(file_path, "w") as file: # Name the file the same name as the folder plus the .mod extension
-        file.write(content)
-
-def make_descriptor_file(name, version, destination):
-    # Define the content string using the provided template
-    content = f'''name="{name}"
-version="{version}"
-tags={{
-    "Gameplay"
-}}
-picture="thumbnail.png"
-supported_version="{version}"'''
-
-    # Specify the file path
-    file_path = os.path.join(destination, "descriptor.mod")
-
-    # Write content to the specified file path
-    with open(file_path, "w") as file:
-        file.write(content)
-
+        

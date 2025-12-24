@@ -2,6 +2,7 @@ import datetime
 import os
 import sys
 import sqlite3
+from libs import paradox
 import util
 
 def main(defaults):
@@ -100,10 +101,12 @@ def main(defaults):
     connection.close()
 
     # Make the description files
-    util.make_mod_file(modPackName, modPackVersion, os.path.dirname(destination))
-    util.make_descriptor_file(modPackName, modPackVersion, destination)
-    util.add_repo_mods(os.path.dirname(destination), modPackVersion)
-
+    paradox.make_mod_file(modPackName, modPackVersion, os.path.dirname(destination))
+    paradox.make_descriptor_file(modPackName, modPackVersion, destination)
+    # Add additional mods
+    repo_keys, repo_destinations = util.add_repo_mods(os.path.dirname(destination), modPackVersion)
+    while i < len(repo_keys):
+        paradox.make_mod_file(repo_keys[i], modPackVersion, destination)
 
 def help():
     print ("Dummy help file")
