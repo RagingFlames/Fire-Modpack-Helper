@@ -2,8 +2,13 @@ import os
 import shutil
 from git import Repo
 import json
+import re
 
 GIT_REPOS_PATH = os.path.join(os.path.curdir,"repo-mods.json")
+GIT_URL_REGEX = re.compile(
+    r'^(git@|ssh://git@|https://|git://)'
+    r'[\w.\-@:\/]+\.git$'
+)
 
 def copy_files(src_folder, dest_folder):
     # Walk through the source folder
@@ -94,9 +99,10 @@ def add_repo_mods(destination, modPackVersion):
 
     # Clone the repos
     for i in sorted(selected):
-        repo_destination=os.path.join(destination,repo_keys[i-1])
-        Repo.clone_from(repos[repo_keys[i-1]],repo_destination)
-        make_mod_file(repo_keys[i-1], modPackVersion, destination)
+        if bool(GIT_URL_REGEX.match(repos[repo_keys[i-1]])):
+            repo_destination=os.path.join(destination,repo_keys[i-1])
+            Repo.clone_from(repos[repo_keys[i-1]],repo_destination)
+            make_mod_file(repo_keys[i-1], modPackVersion, destination)
 
 def make_mod_file(name, version, destination):
     ## The mod file template
