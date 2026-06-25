@@ -1,30 +1,17 @@
 import datetime
 import os
-import sys
 import sqlite3
 from libs import paradox
 import util
+
+game = "Stelaris"
+steamid = "281990"
 
 def main(defaults):
     # Connect to the SQLite database file (create a new file if it doesn't exist)
     formatted_datetime = datetime.datetime.now().strftime("%Y-%m-%d_%H.%M.%S")
     destination = os.path.join(os.getcwd(),formatted_datetime + "_Mod-Pack-Output")
-    if sys.platform.startswith("win"):
-        db_file_path = os.path.expanduser(
-            "~/Documents/Paradox Interactive/Stellaris/launcher-v2.sqlite"
-        )
-        stellaris_workshop = os.path.expanduser(
-            "C:/Program Files (x86)/Steam/steamapps/workshop/content/281990"
-        )  
-    elif sys.platform.startswith("linux"):
-        db_file_path = os.path.expanduser(
-            "~/.local/share/Paradox Interactive/Stellaris/launcher-v2.sqlite"
-        )
-        stellaris_workshop = os.path.expanduser(
-            "~/.steam/steam/steamapps/workshop/content/281990"
-        ) 
-    else:
-        sys.exit(f"Unsupported operating system: {sys.platform}")
+    db_file_path, stellaris_workshop = paradox.get_game_paths(game, steamid)
     connection = sqlite3.connect(db_file_path)
 
     # Create a cursor object to execute SQL queries
@@ -43,22 +30,8 @@ def main(defaults):
 
     # Get all relevant mods
     cursor.execute("SELECT * FROM playsets_mods")
-    rows = cursor.fetchall()
-    modIDList = []
-    for row in rows:
-        if (row[0] == playset):
-            modIDList.append(row)
-    # Sort the list by load order
-    modIDList = sorted(modIDList, key=lambda x: x[3])
-
-    cursor.execute("SELECT * FROM mods")
-    rows = cursor.fetchall()
-    modWorkshopIDList = []
-    for mod in modIDList:  # For every mod in the list
-        for row in rows:  # For every row in the mods table
-            if row[0] == mod[1]:
-                modWorkshopIDList.append(row)
-
+    modWorkshopIDList = paradox.get_mods(cursor)
+ 
     # Print sorted mod list
     print("The following mods will be used in this order for the modpack")
     for mod in modWorkshopIDList:
@@ -79,11 +52,11 @@ def main(defaults):
 
     # Find the workshop mods
     workshopPath = defaults["stellaris"]
-    if not os.path.basename(os.path.normpath(workshopPath)) == "281990" or not os.path.isdir(workshopPath): # A really stupid simple check for the right path
+    if not os.path.basename(os.path.normpath(workshopPath)) == steamid or not os.path.isdir(workshopPath): # A really stupid simple check for the right path
         print("It looks like we aren't looking at the correct workshop folder. Please copy and paste your workshop path.")
         while True:
             workshopPath = input("Copy paste the path to your stellaris workshop folder\n")
-            if not os.path.basename(os.path.normpath(workshopPath)) == "281990": # A really stupid simple check for the right path
+            if not os.path.basename(os.path.normpath(workshopPath)) == steamid: # A really stupid simple check for the right path
                 print("It looks like you didn't paste the correct folder, the path should end at the '281990' folder")
             else:
                 break
