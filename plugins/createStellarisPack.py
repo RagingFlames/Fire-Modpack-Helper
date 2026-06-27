@@ -82,4 +82,4 @@ def main(defaults):
         paradox.make_mod_file(repo_keys[i], modPackVersion, destination)
 
 def help():
-    print ("Dummy help file")
+    print ("Creates a modpack for Stellaris")
